@@ -17,14 +17,13 @@ def comp_radius_mid_yoke(self):
 
     """
 
-    Rmin = self.Rext
-    Rmax = self.Rint
+    Rmax = max(self.Rext, self.Rint)
+    Rmin = min(self.Rext, self.Rint)
     for hole in self.hole:
         if type(hole) is not Hole:
             (Rmin_hole, Rmax_hole) = hole.comp_radius()
-            Rmin = min(Rmin, Rmin_hole)
-            Rmax = max(Rmax, Rmax_hole)
-    if self.is_internal:
-        return (self.Rint + Rmin) / 2
-    else:
-        return (self.Rext + Rmax) / 2
+            Rmin = min(Rmin, Rmin_hole, Rmax_hole)
+            Rmax = max(Rmax, Rmin_hole, Rmax_hole)
+
+    return (Rmin + Rmax) / 2
+
