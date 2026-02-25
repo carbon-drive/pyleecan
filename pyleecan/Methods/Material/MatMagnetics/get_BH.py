@@ -14,24 +14,30 @@ def get_BH(self):
 
     """
 
+    BH = None
     if self.BH_curve is not None:
-        BH = self.BH_curve.get_data()
+        try:
+            BH = self.BH_curve.get_data()
+        except AttributeError:
+            BH = None
 
-        if len(BH.shape) != 2:
+        if BH is None or getattr(BH, "size", 0) == 0:
+            BH = None
+        elif len(BH.shape) != 2:
             raise BHShapeError(
                 "BH must be a two colums matrix: H and B(H). Return shape: "
                 + str(BH.shape)
             )
-        if BH.shape[1] != 2:
+        if BH is not None and BH.shape[1] != 2:
             raise BHShapeError(
                 "BH must be a two colums matrix: H and B(H). Return shape: "
                 + str(BH.shape)
             )
 
-        if self.is_BH_extrapolate:
+        if BH is not None and self.is_BH_extrapolate:
             BH = self.ModelBH.fit_model(BH=BH)
 
-    else:
+    if BH is None:
         BH = self.ModelBH.get_BH()
 
     if self.mur_lin is None and BH is None:
